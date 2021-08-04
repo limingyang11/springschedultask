@@ -39,6 +39,9 @@ public class TaskService {
      * @return
      */
     public String deleteTask(long id) {
+        if (map.get(id) == null) {
+            throw new ResultException(ResultUtil.RESOURCE_IS_NOT_EXIST, ResultUtil.getMessage(ResultUtil.RESOURCE_IS_NOT_EXIST));
+        }
         schedulTask.removeTask(id);
         return "success";
     }
