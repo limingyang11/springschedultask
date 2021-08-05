@@ -15,6 +15,10 @@ public class ResultException extends RuntimeException {
     public ResultException() {
     }
 
+    public ResultException(Throwable e) {
+        super(e);
+    }
+
     public int getCode() {
         return code;
     }

@@ -1,5 +1,6 @@
 package com.my.springtask.task;
 
+import com.my.springtask.dto.ResultDTO;
 import com.my.springtask.dto.TaskJobDTO;
 import com.my.springtask.utils.ResultException;
 import com.my.springtask.utils.ResultUtil;
@@ -34,10 +35,10 @@ public class SchedulTask implements SchedulingConfigurer {
      * 添加定时任务
      * @param taskJobDTO
      */
-    public void addTask(TaskJobDTO taskJobDTO) {
+    public ResultDTO addTask(TaskJobDTO taskJobDTO) {
         String cron = getCron(taskJobDTO.getStartTime());
         if (StringUtils.isEmpty(cron)) {
-            throw new ResultException(ResultUtil.CRON_IS_NOT_EMPTY, ResultUtil.getMessage(ResultUtil.CRON_IS_NOT_EMPTY));
+            return new ResultDTO(ResultUtil.CRON_IS_NOT_EMPTY, ResultUtil.getMessage(ResultUtil.CRON_IS_NOT_EMPTY), taskJobDTO);
         }
 
         try {
@@ -49,20 +50,23 @@ public class SchedulTask implements SchedulingConfigurer {
             LOGGER.info("新增定时任务成功：{}", taskJobDTO.getId());
         }catch (Exception e) {
             LOGGER.error("新增定时任务失败：{}", taskJobDTO.getId());
-            throw new ResultException(ResultUtil.ADD_NEW_TASK_FAILED, ResultUtil.getMessage(ResultUtil.ADD_NEW_TASK_FAILED));
+            return new ResultDTO<>(ResultUtil.ADD_NEW_TASK_FAILED, ResultUtil.getMessage(ResultUtil.ADD_NEW_TASK_FAILED), e.getMessage());
         }
+        return new ResultDTO<>(ResultUtil.OK, "success", taskJobDTO);
     }
 
     /**
      * 删除定时任务
      * @param id
      */
-    public void removeTask(long id) {
+    public ResultDTO removeTask(long id) {
         ScheduledTask scheduledTask = scheduledTaskMap.get(id);
         if (scheduledTask != null) {
             scheduledTask.cancel();
             LOGGER.info("删除定时任务成功：{}" , id);
+            return new ResultDTO<>(ResultUtil.OK, "success", id);
         }
+        return new ResultDTO<>(ResultUtil.FAIL, "failed", id);
     }
 
     private void executeJob(TaskJobDTO taskJobDTO) {
@@ -84,6 +88,7 @@ public class SchedulTask implements SchedulingConfigurer {
             LOGGER.info(String.format(time + "转化为：%d年%d月%d日%d时%d分%d秒", now.get(Calendar.YEAR), now.get(Calendar.MONTH) + 1, now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE), now.get(Calendar.SECOND)));
             return String.format("%d %d %d %d %d ?", now.get(Calendar.SECOND), now.get(Calendar.MINUTE), now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.DAY_OF_MONTH), now.get(Calendar.MONTH) + 1);
         } catch (Exception e) {
+            LOGGER.error("{},{}", ResultUtil.TIME_INTRAFROM_FAIL, ResultUtil.getMessage(ResultUtil.TIME_INTRAFROM_FAIL));
             throw new ResultException(ResultUtil.TIME_INTRAFROM_FAIL, ResultUtil.getMessage(ResultUtil.TIME_INTRAFROM_FAIL));
         }
     }

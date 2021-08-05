@@ -1,8 +1,8 @@
 package com.my.springtask.controller;
 
+import com.my.springtask.dto.ResultDTO;
 import com.my.springtask.dto.TaskJobDTO;
 import com.my.springtask.service.TaskService;
-import com.my.springtask.utils.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,22 +18,22 @@ public class TaskController {
     }
 
     @RequestMapping(value = "/add", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
-    public String addTask(@RequestBody TaskJobDTO taskJobDTO) {
+    public ResultDTO addTask(@RequestBody TaskJobDTO taskJobDTO) {
         return taskService.addTask(taskJobDTO);
     }
 
     @RequestMapping(value = "/modify", method = RequestMethod.POST, produces = "application/json;charset=utf-8")
-    public String modifyTask(@RequestBody TaskJobDTO taskJobDTO) {
+    public ResultDTO modifyTask(@RequestBody TaskJobDTO taskJobDTO) {
         return taskService.addTask(taskJobDTO);
     }
 
     @RequestMapping(value = "/delete", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
-    public String deleteTask(@RequestParam(value = "id", required = true) long id) {
+    public ResultDTO deleteTask(@RequestParam(value = "id", required = true) long id) {
         return taskService.deleteTask(id);
     }
 
     @RequestMapping(value = "/resume", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
-    public String resumeTask(@RequestParam(value = "id", required = true) long id) {
+    public ResultDTO resumeTask(@RequestParam(value = "id", required = true) long id) {
         return taskService.resumeTask(id);
     }
 }

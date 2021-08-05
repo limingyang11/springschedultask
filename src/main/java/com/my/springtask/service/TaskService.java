@@ -1,8 +1,8 @@
 package com.my.springtask.service;
 
+import com.my.springtask.dto.ResultDTO;
 import com.my.springtask.dto.TaskJobDTO;
 import com.my.springtask.task.SchedulTask;
-import com.my.springtask.utils.ResultException;
 import com.my.springtask.utils.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,44 +16,51 @@ public class TaskService {
     private static Map<Long, TaskJobDTO> map = new HashMap<>();
 
     @Autowired
-    public TaskService (SchedulTask schedulTask) {
+    public TaskService(SchedulTask schedulTask) {
         this.schedulTask = schedulTask;
     }
 
     /**
      * 新增或修改
+     *
      * @param taskJobDTO
      * @return
      */
-    public String addTask(TaskJobDTO taskJobDTO) {
-        schedulTask.addTask(taskJobDTO);
+    public ResultDTO addTask(TaskJobDTO taskJobDTO) {
+        ResultDTO resultDTO = new ResultDTO<>(ResultUtil.OK, "success", taskJobDTO);
+        resultDTO = schedulTask.addTask(taskJobDTO);
         if (map.get(taskJobDTO.getId()) != null) {
             map.put(taskJobDTO.getId(), taskJobDTO);
         }
-        return "success";
+        return resultDTO;
     }
 
     /**
      * 删除或者暂停
+     *
      * @param id
      * @return
      */
-    public String deleteTask(long id) {
-        schedulTask.removeTask(id);
-        return "success";
+    public ResultDTO deleteTask(long id) {
+        if (map.get(id) == null) {
+            return new ResultDTO(ResultUtil.RESOURCE_IS_NOT_EXIST, ResultUtil.getMessage(ResultUtil.RESOURCE_IS_NOT_EXIST), id);
+        }
+
+        return schedulTask.removeTask(id);
     }
 
     /**
      * 恢复
+     *
      * @param id
      * @return
      */
-    public String resumeTask(long id) {
+    public ResultDTO resumeTask(long id) {
         TaskJobDTO taskJobDTO = map.get(id);
         if (taskJobDTO == null) {
-            throw new ResultException(ResultUtil.RESOURCE_IS_NOT_EXIST, ResultUtil.getMessage(ResultUtil.RESOURCE_IS_NOT_EXIST));
+            return new ResultDTO(ResultUtil.RESOURCE_IS_NOT_EXIST, ResultUtil.getMessage(ResultUtil.RESOURCE_IS_NOT_EXIST), id);
         }
-        schedulTask.addTask(taskJobDTO);
-        return "success";
+
+        return schedulTask.addTask(taskJobDTO);
     }
 }

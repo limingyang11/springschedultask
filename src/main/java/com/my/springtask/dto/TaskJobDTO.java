@@ -2,15 +2,16 @@ package com.my.springtask.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class TaskJobDTO {
+public class TaskJobDTO implements Serializable {
     private long id;
 
     private String name;
 
     private String desc;
-    @JsonFormat(locale="zh", timezone="GMT+8", pattern="yyyy-MM-dd HH:mm:ss")
+
     private Date startTime;
 
     private String cron;
